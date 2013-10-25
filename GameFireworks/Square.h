@@ -24,6 +24,7 @@ private:
     CC_SYNTHESIZE(bool, _north, North);
     CC_SYNTHESIZE(bool, _startPoint, StartPoint);
     CC_SYNTHESIZE(bool, _destination, Destination);
+    CC_SYNTHESIZE(bool, _isMoveTouch, IsMoveTouch);
     CC_SYNTHESIZE(int, _row, Row);
     CC_SYNTHESIZE(int, _column, Column);
 };

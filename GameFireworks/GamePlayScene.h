@@ -11,6 +11,7 @@
 #include "cocos2d.h"
 #include "TableGame.h"
 #include "Square.h"
+#define max 100
 using namespace cocos2d;
 class GamePlayScene : public CCLayer
 {
@@ -28,10 +29,18 @@ public:
 	virtual void ccTouchesEnded(cocos2d::CCSet* touches,cocos2d::CCEvent* event);
     
     void addTableGame(int rows, int columns);
+    void loadMatrix();
+    void changeMatrix(Square *sq);
+    void printMatrix();
 private:
     CCSize  size;
     TableGame * tableGame;
     CCArray * _arraySquare;
     CCPoint touchLocation;
+    int matran[max][max];
+    int daxet[max];
+    int pa[max];
+    int chiphi;
+    int c;//chi phí tạm thời
 };
 #endif

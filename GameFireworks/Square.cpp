@@ -22,4 +22,5 @@ Square::Square(bool notContain, bool w, bool e, bool n, bool s, int row, int col
     this->setColumn(column);
     this->setStartPoint(statPoint);
     this->setDestination(destination);
+    this->setIsMoveTouch(false);
 }
