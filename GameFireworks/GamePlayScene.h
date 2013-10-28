@@ -11,6 +11,8 @@
 #include "cocos2d.h"
 #include "TableGame.h"
 #include "Square.h"
+#include "Coin.h"
+#include "Missile.h"
 #define max 100
 using namespace cocos2d;
 class GamePlayScene : public CCLayer
@@ -29,14 +31,20 @@ public:
 	virtual void ccTouchesEnded(cocos2d::CCSet* touches,cocos2d::CCEvent* event);
     
     void addTableGame(int rows, int columns);
+    void addCoins();
+    void addCoin(int row, float speed, int path[]);
+    void addMissiles();
     void loadMatrix();
     void changeMatrix(Square *sq);
-    void printMatrix();
+    void printMatrix(int matrix[100][100], int row, int column);
     void backTracking(int i);
+    void backTrackingNew(int i, Square * taget);
     void loadStartPointAndDestination();
     void InPa();
     void resetArray(int a[]);
     void checkTableGame();
+    void addArrayInArray(int arrayPaths[20][100], int arrayPath[], int row, int sizeArray);
+    void resetArrayTow(int a[100][100]);
 private:
     CCSize  size;
     TableGame * tableGame;
@@ -46,9 +54,11 @@ private:
     int arrarDestination[20];
     int arrayStart[20];
     int matran[max][max];
+    int arrayPath[max][max];
     int daxet[max];
     int pa[max];
     int chiphi;
     int c;//chi phí tạm thời
+    int _numberPath;
 };
 #endif

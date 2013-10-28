@@ -43,28 +43,21 @@ bool GamePlayScene::init()
     size = CCDirector::sharedDirector()->getWinSize();
     _arraySquare = new CCArray();
     _arrayRemove = new CCArray();
-//    daxet[1] = 1;
-//    pa[1] = 1;
-//    c = 0;
-//    this->addTableGame(9, 6);
-//    this->loadMatrix();
-//    this->printMatrix();
-//    this->backTracking(2);
+    _numberPath = 0;
     
-    
-//    pa[1] = 7;
-//    daxet[pa[1]] = 1;
-//    c = 0;
     this->addTableGame(9, 6);
     this->loadMatrix();
 //    this->printMatrix();
     this->checkTableGame();
 
+    this->addCoins();
+    this->addMissiles();
+    
     return true;
 }
 void GamePlayScene::addTableGame(int rows, int columns) {
-    CCPoint pOrigin = CCPoint(0, 0);
-    float WithTable = size.width * 5 / 6;
+    CCPoint pOrigin = CCPoint(- size.width / 20, 0);
+    float WithTable = size.width * 5 / 7;
     float HeightTable = size.height * 5 / 6;
     tableGame = new TableGame(rows, columns, pOrigin, WithTable, HeightTable);
     float with = tableGame->getWidth() / tableGame->getColumns() * 1.0f;
@@ -145,6 +138,34 @@ void GamePlayScene::addTableGame(int rows, int columns) {
         }
     }
 
+}
+void GamePlayScene::addCoins() {
+    for (int i = 1; i <= tableGame->getRows(); i++) {
+        Coin *coin = new Coin();
+        coin->initWithFile("Icon.png");
+        coin->setScale(0.5f);
+        Square * sq = (Square*)this->getChildByTag(1 + tableGame->getColumns() * (i - 1));
+        CCPoint p = CCPoint(sq->getPosition().x - sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
+        coin->setPosition(p);
+        coin->setTag(100 + i);
+        this->addChild(coin, 10);
+    }
+}
+void GamePlayScene::addCoin(int row, float speed) {
+    
+}
+void GamePlayScene::addMissiles() {
+    for (int i = 1; i <= tableGame->getRows(); i++) {
+        Missile *missile = new Missile();
+        missile->initWithFile("Icon.png");
+        missile->setScale(0.5f);
+        missile->setColor(ccc3(255, 0, 0));
+        Square * sq = (Square*)this->getChildByTag(tableGame->getColumns() * i);
+        CCPoint p = CCPoint(sq->getPosition().x + sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
+        missile->setPosition(p);
+        missile->setTag(200 + i);
+        this->addChild(missile, 10);
+    }
 }
 void GamePlayScene::ccTouchesBegan(cocos2d::CCSet * touch,cocos2d::CCEvent* event)
 {
@@ -287,10 +308,20 @@ void GamePlayScene::checkTableGame() {
             pa[1] = k;
             daxet[pa[1]] = 1;
             c = 0;
-            this->loadMatrix();
-            this->backTracking(2);
+            //            this->loadMatrix();
+            for (int j = 1; j <= tableGame->getRows(); j ++) {
+                Square * sqTaget = (Square*)this->getChildByTag(j * tableGame->getColumns());
+                if (sqTaget->getDestination()) {
+                    this->backTrackingNew(2, sqTaget);
+                    
+                }
+            }            
         }
     }
+    
+    this->printMatrix(arrayPath, _numberPath, 25);
+    _numberPath = 0;
+    this->resetArrayTow(arrayPath);
 }
 void GamePlayScene::backTracking(int i) {
     int n = tableGame->getRows() * tableGame->getColumns();
@@ -303,20 +334,41 @@ void GamePlayScene::backTracking(int i) {
             Square * sq = (Square*)this->getChildByTag(j);
             if(sq->getDestination() == true)
             {
+//                sq->setDestination(false);
 //                if(matran[pa[n]][1])
                 {
 //                    chiphi = c;
 //                    chiphi += matran[pa[n]][1];
 //                    pa[n+1] = 1;
 //                    InPa();
-                    
-                    for (int k = 1; k < 15; k++) {
-                        printf("%i   ", pa[k]);
-                    }
-                    printf("\n");
+                    _numberPath ++;
+                    this->addArrayInArray(arrayPath, pa, _numberPath, i);
+//                    for (int k = 1; k < 20; k++) {
+//                        printf("%i   ", pa[k]);
+//                    }
+//                    printf("\n so dinh cua duong di :%i", i);
 //                    this->resetArray(pa); // them dong nay vao la khong tim duoc het phuong an
                 }
             }else backTracking(i+1);
+            
+            daxet[j] = 0;
+            c -= matran[pa[i-1]][j];
+        }
+}
+void GamePlayScene::backTrackingNew(int i, Square * sqTaget) {
+    int n = tableGame->getRows() * tableGame->getColumns();
+    for(int j=2; j<=n; j++)
+        if(daxet[j] != 1 && matran[pa[i-1]][j] == 1)
+        {
+            
+            pa[i] = j;
+            daxet[j] = 1;
+            c += matran[pa[i-1]][j];
+            if(sqTaget->getTag() == j)
+            {
+                _numberPath ++;
+                this->addArrayInArray(arrayPath, pa, _numberPath, i);
+            }else backTrackingNew(i+1, sqTaget);
             
             daxet[j] = 0;
             c -= matran[pa[i-1]][j];
@@ -445,9 +497,9 @@ void GamePlayScene::changeMatrix(Square *sq) {
         }
     }
 }
-void GamePlayScene::printMatrix() {
-    for (int i = 1; i <= tableGame->getColumns() * tableGame->getRows() ; i++) {
-        for (int j = 1; j <= tableGame->getColumns() * tableGame->getRows() ; j++) {
+void GamePlayScene::printMatrix(int (*matran)[100], int row, int column) {
+    for (int i = 1; i <= row ; i++) {
+        for (int j = 1; j <= column ; j++) {
             printf("%i  ", matran[i][j]);
         }
         printf("\n");
@@ -460,5 +512,22 @@ void GamePlayScene::InPa()
 void GamePlayScene::resetArray(int a[]) {
     for (int i = 0; i < max; i++) {
         a[i] = 0;
+    }
+}
+void GamePlayScene::resetArrayTow(int (*a)[100]) {
+    for (int i = 0; i < 20; i ++) {
+        for (int j = 0; j < 50; j++) {
+            a[i][j] = 0;
+        }
+    }
+}
+void GamePlayScene::addArrayInArray(int (*arrayPaths)[100], int *arrayPath, int row, int sizeArray) {
+    for (int i = 1; i <= sizeArray; i ++) {
+        arrayPaths[row][i] = arrayPath[i];
+//        Square * sq = (Square*)this->getChildByTag(arrayPath[i]);
+//        if (sq->getDestination()) {
+//            this->addCoins();
+//            break;
+//        }
     }
 }
