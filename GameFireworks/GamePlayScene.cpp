@@ -9,6 +9,7 @@
 #include "GamePlayScene.h"
 #include "SimpleAudioEngine.h"
 #include "Square.h"
+#include <stdio.h>
 using namespace cocos2d;
 using namespace CocosDenshion;
 
@@ -30,6 +31,8 @@ CCScene* GamePlayScene::scene()
 // on "init" you need to initialize your instance
 bool GamePlayScene::init()
 {
+    srandom(time(NULL));
+    
     //////////////////////////////
     // 1. super init first
     if ( !CCLayer::init() )
@@ -39,12 +42,28 @@ bool GamePlayScene::init()
     this->setTouchEnabled(true);
     size = CCDirector::sharedDirector()->getWinSize();
     _arraySquare = new CCArray();
-    this->addTableGame(4, 3);
-   
+    _arrayRemove = new CCArray();
+//    daxet[1] = 1;
+//    pa[1] = 1;
+//    c = 0;
+//    this->addTableGame(9, 6);
+//    this->loadMatrix();
+//    this->printMatrix();
+//    this->backTracking(2);
+    
+    
+//    pa[1] = 7;
+//    daxet[pa[1]] = 1;
+//    c = 0;
+    this->addTableGame(9, 6);
+    this->loadMatrix();
+//    this->printMatrix();
+    this->checkTableGame();
+
     return true;
 }
 void GamePlayScene::addTableGame(int rows, int columns) {
-    CCPoint pOrigin = CCPoint(-150, -100);
+    CCPoint pOrigin = CCPoint(0, 0);
     float WithTable = size.width * 5 / 6;
     float HeightTable = size.height * 5 / 6;
     tableGame = new TableGame(rows, columns, pOrigin, WithTable, HeightTable);
@@ -95,9 +114,11 @@ void GamePlayScene::addTableGame(int rows, int columns) {
             if (dem == 1 + columns * (i - 1) && w == true) {
                 statPoint = true;
             }else statPoint = false;
+            
             if (dem == i * columns && e == true) {
                 destination = true;
             }else destination = false;
+            
             Square *sq = new  Square(notContain, w, e, n, s, i, j, statPoint, destination );
 //            sq->setSelected(false);
             sq->initWithFile(spriteName);
@@ -127,8 +148,7 @@ void GamePlayScene::addTableGame(int rows, int columns) {
 }
 void GamePlayScene::ccTouchesBegan(cocos2d::CCSet * touch,cocos2d::CCEvent* event)
 {
-    this->loadMatrix();
-    this->printMatrix();
+   
 //    if (tableGame->getArraySquare()->count()>=49)
     {
 
@@ -137,29 +157,42 @@ void GamePlayScene::ccTouchesBegan(cocos2d::CCSet * touch,cocos2d::CCEvent* even
         touchLocation=CCDirector::sharedDirector()->convertToGL(p2);
         Square * sq1 = (Square*)_arraySquare->objectAtIndex(1);
         //        sq1->tinto_rotation();
-        if (touchLocation.x >= tableGame->getPointOrigin().x + sq1->getContentSize().width / 2 &&
-            touchLocation.x <= tableGame->getPointOrigin().x + tableGame->getWidth() + sq1->getContentSize().width &&
-            touchLocation.y >= tableGame->getPointOrigin().y + sq1->getContentSize().height / 2 &&
-            touchLocation.y <= tableGame->getPointOrigin().y + tableGame->getHeight()  + sq1->getContentSize().height) {
-            
-            int H = (int)(tableGame->getHeight() / tableGame->getRows());
-            int W = (int)(tableGame->getWidth() / tableGame->getColumns());
-            int px = (int)(tableGame->getPointOrigin().x +  sq1->getContentSize().width * sq1->getScaleX());
-            int py = (int)(tableGame->getPointOrigin().y +  sq1->getContentSize().height * sq1->getScaleY());
-            int col = (int)((touchLocation.x - px) / W ) + 1;
-            int row = (int)((touchLocation.y - py) / H ) + 1;
-            int tag = (row - 1) * tableGame->getColumns() + col;
-            
-            if (this->getChildByTag(tag) != NULL) {
-                Square * sqSelected1 = (Square*)this->getChildByTag(tag);
-//                CCSprite * sp = CCSprite::create("Icon.png");
-//                sp->setScale(0.5f);
-//                sp->setPosition(sqSelected1->getPosition());
-//                this->addChild(sp, 10);
-                CCRotateTo * rotate = CCRotateTo::create(0.0f, sqSelected1->getRotation() + 90);
-                sqSelected1->runAction(rotate);
-            }
-        }
+//        if (touchLocation.x >= tableGame->getPointOrigin().x + sq1->getContentSize().width / 2 &&
+//            touchLocation.x <= tableGame->getPointOrigin().x + tableGame->getWidth() + sq1->getContentSize().width &&
+//            touchLocation.y >= tableGame->getPointOrigin().y + sq1->getContentSize().height / 2 &&
+//            touchLocation.y <= tableGame->getPointOrigin().y + tableGame->getHeight()  + sq1->getContentSize().height) {
+//            
+//            int H = (int)(tableGame->getHeight() / tableGame->getRows());
+//            int W = (int)(tableGame->getWidth() / tableGame->getColumns());
+//            int px = (int)(tableGame->getPointOrigin().x +  sq1->getContentSize().width * sq1->getScaleX());
+//            int py = (int)(tableGame->getPointOrigin().y +  sq1->getContentSize().height * sq1->getScaleY());
+//            int col = (int)((touchLocation.x - px) / W ) + 1;
+//            int row = (int)((touchLocation.y - py) / H ) + 1;
+//            int tag = (row - 1) * tableGame->getColumns() + col;
+//            
+//            if (this->getChildByTag(tag) != NULL) {
+//                Square * sqSelected1 = (Square*)this->getChildByTag(tag);
+////                CCSprite * sp = CCSprite::create("Icon.png");
+////                sp->setScale(0.5f);
+////                sp->setPosition(sqSelected1->getPosition());
+////                this->addChild(sp, 10);
+////                CCRotateTo * rotate = CCRotateTo::create(0.0f, sqSelected1->getRotation() + 90);
+////                sqSelected1->runAction(rotate);
+//                sqSelected1->changeRotation(tableGame->getColumns());
+////                this->loadMatrix();
+//                this->changeMatrix(sqSelected1);
+//               
+////                this->backTracking(5);
+////                this->backTracking(8);
+////                this->backTracking(11);
+////                daxet[1] = 1;
+////                pa[1] = 1;
+////                c = 0;
+////                this->backTracking(2);
+////                this->printMatrix();
+//                this->checkTableGame();
+//            }
+//        }
     }
 }
 void GamePlayScene::ccTouchesMoved(cocos2d::CCSet* touches, cocos2d::CCEvent* event) {
@@ -190,8 +223,11 @@ void GamePlayScene::ccTouchesMoved(cocos2d::CCSet* touches, cocos2d::CCEvent* ev
                     //                sp->setPosition(sqSelected1->getPosition());
                     //                this->addChild(sp, 10);
                     
-                    CCRotateTo * rotate = CCRotateTo::create(0.0f, sqSelected1->getRotation() + 90);
-                    sqSelected1->runAction(rotate);
+//                    CCRotateTo * rotate = CCRotateTo::create(0.0f, sqSelected1->getRotation() + 90);
+//                    sqSelected1->runAction(rotate);
+                    sqSelected1->changeRotation(tableGame->getColumns());
+//                    this->changeMatrix(sqSelected1);
+//                    this->loadMatrix();
                 }
             }
         }
@@ -204,96 +240,103 @@ void GamePlayScene::ccTouchesEnded(cocos2d::CCSet* touches,cocos2d::CCEvent* eve
         Square * sq = (Square*)i;
         sq->setIsMoveTouch(false);
     }
-    //    this->schedule(schedule_selector(GamePlay::update), 1/50);
-//    if (touchmove == false) {
-//        CCTouch *touch1 = (CCTouch*)(touches->anyObject());
-//        CCPoint p2 = touch1->getLocationInView();
-//        CCPoint touchpoint = CCDirector::sharedDirector()->convertToGL(p2);
-//        int k1 = 0;
-//        int k2 = 0;
-//        if (sqSelected != NULL && sqSelected2 != NULL && sqSelected->getSelected() == true &&
-//            sqSelected2->getSelected() == true) {
-//            int c = asb(sqSelected->getCol() - sqSelected2->getCol());
-//            int r = asb(sqSelected2->getRow() - sqSelected->getRow());
-//            if (c == 1 && r == 0) {
-//                if (sqSelected->getCol() - sqSelected2->getCol() == -1) {
-//                    sqSelected->moveTop();
-//                    sqSelected2->moveDown();
-//                    directionMoveSqSelected = 2;
-//                    k1 = 2;
-//                    k2 = 1;
-//                }else if (sqSelected->getCol() - sqSelected2->getCol() == 1) {
-//                    sqSelected2->moveTop();
-//                    sqSelected->moveDown();
-//                    directionMoveSqSelected = 1;
-//                    k1 = 1;
-//                    k2 = 2;
-//                }
-//            }else if(r == 1 && c == 0) {
-//                if (sqSelected2->getRow() - sqSelected->getRow() == -1) {
-//                    sqSelected2->moveRight();
-//                    sqSelected->moveLeft();
-//                    directionMoveSqSelected = 4;
-//                    k1 = 3;
-//                    k2 = 4;
-//                }else if (sqSelected2->getRow() - sqSelected->getRow() == 1) {
-//                    sqSelected->moveRight();
-//                    sqSelected2->moveLeft();
-//                    directionMoveSqSelected = 3;
-//                    k1 = 4;
-//                    k2 = 3;
-//                }
-//            }
-//            if (this->checkSquareMove(sqSelected) == false && this->checkSquareMove(sqSelected2) == false) {
-//                switch (k1) {
-//                    case 1:
-//                        sqSelected->moveTop();
-//                        break;
-//                    case 2:
-//                        sqSelected->moveDown();
-//                        break;
-//                    case 3:
-//                        sqSelected->moveRight();
-//                        break;
-//                    case 4:
-//                        sqSelected->moveLeft();
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                switch (k2) {
-//                    case 1:
-//                        sqSelected2->moveTop();
-//                        break;
-//                    case 2:
-//                        sqSelected2->moveDown();
-//                        break;
-//                    case 3:
-//                        sqSelected2->moveRight();
-//                        break;
-//                    case 4:
-//                        sqSelected2->moveLeft();
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//            sqSelected2 = NULL;
-//            sqSelected = NULL;
-//            CCObject *i;
-//            CCARRAY_FOREACH(tableGame->getArraySquare(), i) {
-//                Square * sq = (Square*) i;
-//                if (sq->getSelected() == true) {
-//                    sq->setSelected(false);
-//                    sq->removeAllChildren();
-//                }
-//            }
-//        }
-//    }
-//    else if (touchmove == true) {
-//        sqSelected = NULL;
-//        sqSelected2 = NULL;
-//    }
+    Square * sq1 = (Square*)_arraySquare->objectAtIndex(1);
+    if (touchLocation.x >= tableGame->getPointOrigin().x + sq1->getContentSize().width / 2 &&
+        touchLocation.x <= tableGame->getPointOrigin().x + tableGame->getWidth() + sq1->getContentSize().width &&
+        touchLocation.y >= tableGame->getPointOrigin().y + sq1->getContentSize().height / 2 &&
+        touchLocation.y <= tableGame->getPointOrigin().y + tableGame->getHeight()  + sq1->getContentSize().height) {
+        
+        int H = (int)(tableGame->getHeight() / tableGame->getRows());
+        int W = (int)(tableGame->getWidth() / tableGame->getColumns());
+        int px = (int)(tableGame->getPointOrigin().x +  sq1->getContentSize().width * sq1->getScaleX());
+        int py = (int)(tableGame->getPointOrigin().y +  sq1->getContentSize().height * sq1->getScaleY());
+        int col = (int)((touchLocation.x - px) / W ) + 1;
+        int row = (int)((touchLocation.y - py) / H ) + 1;
+        int tag = (row - 1) * tableGame->getColumns() + col;
+        
+        if (this->getChildByTag(tag) != NULL) {
+            Square * sqSelected1 = (Square*)this->getChildByTag(tag);
+            //                CCSprite * sp = CCSprite::create("Icon.png");
+            //                sp->setScale(0.5f);
+            //                sp->setPosition(sqSelected1->getPosition());
+            //                this->addChild(sp, 10);
+            //                CCRotateTo * rotate = CCRotateTo::create(0.0f, sqSelected1->getRotation() + 90);
+            //                sqSelected1->runAction(rotate);
+            sqSelected1->changeRotation(tableGame->getColumns());
+            this->loadMatrix();
+//            this->changeMatrix(sqSelected1);
+            
+            //                this->backTracking(5);
+            //                this->backTracking(8);
+            //                this->backTracking(11);
+            //                daxet[1] = 1;
+            //                pa[1] = 1;
+            //                c = 0;
+            //                this->backTracking(2);
+            //                this->printMatrix();
+            this->checkTableGame();
+        }
+    }
+}
+void GamePlayScene::checkTableGame() {
+    for (int i = 1; i <= tableGame->getRows(); i ++) {
+        int k = 1 + (i - 1) * tableGame->getColumns() ;
+        Square * sq = (Square*)this->getChildByTag(k);
+        if (sq->getStartPoint() == true)
+        {
+            pa[1] = k;
+            daxet[pa[1]] = 1;
+            c = 0;
+            this->loadMatrix();
+            this->backTracking(2);
+        }
+    }
+}
+void GamePlayScene::backTracking(int i) {
+    int n = tableGame->getRows() * tableGame->getColumns();
+    for(int j=2; j<=n; j++)
+        if(daxet[j] != 1 && matran[pa[i-1]][j] == 1)
+        {
+            pa[i] = j;
+            daxet[j] = 1;
+            c += matran[pa[i-1]][j];
+            Square * sq = (Square*)this->getChildByTag(j);
+            if(sq->getDestination() == true)
+            {
+//                if(matran[pa[n]][1])
+                {
+//                    chiphi = c;
+//                    chiphi += matran[pa[n]][1];
+//                    pa[n+1] = 1;
+//                    InPa();
+                    
+                    for (int k = 1; k < 15; k++) {
+                        printf("%i   ", pa[k]);
+                    }
+                    printf("\n");
+//                    this->resetArray(pa); // them dong nay vao la khong tim duoc het phuong an
+                }
+            }else backTracking(i+1);
+            
+            daxet[j] = 0;
+            c -= matran[pa[i-1]][j];
+        }
+}
+void GamePlayScene::loadStartPointAndDestination() {
+    int dS = 0;
+    int dD = 0;
+    CCObject *i;
+    CCARRAY_FOREACH(_arraySquare, i) {
+        Square * sq = (Square*)i;
+        if (sq->getStartPoint()) {
+            dS ++ ;
+            arrayStart[dS] = sq->getTag();
+        }
+        if (sq->getDestination()) {
+            dD ++;
+            arrarDestination[dD] = sq->getTag();
+        }
+    }
 }
 void GamePlayScene::loadMatrix() {
     if (_arraySquare->count() >= tableGame->getColumns() * tableGame->getRows()) {
@@ -307,7 +350,7 @@ void GamePlayScene::loadMatrix() {
                         Square *sq1 = (Square*)this->getChildByTag(i + 1);
                         if (sq->getEast() && sq1->getWest()) {
                             matran[i][i+1] = 1;
-                        }else matran[i][i+1] = -1;
+                        }else matran[i][i+1] = 0;
                     }
                 }
                                 
@@ -317,7 +360,7 @@ void GamePlayScene::loadMatrix() {
                         Square *sq1 = (Square*)this->getChildByTag(i - 1);
                         if (sq1->getEast() && sq->getWest()) {
                             matran[i][i-1] = 1;
-                        }else matran[i][i-1] = -1;
+                        }else matran[i][i-1] = 0;
                     }
                 }
                 
@@ -328,7 +371,7 @@ void GamePlayScene::loadMatrix() {
                         Square *sq1 = (Square*)this->getChildByTag(i + tableGame->getColumns());
                         if (sq1->getSouth() && sq->getNorth()) {
                             matran[i][i + tableGame->getColumns()] = 1;
-                        }else matran[i][i + tableGame->getColumns()] = -1;
+                        }else matran[i][i + tableGame->getColumns()] = 0;
                     }
                 }
                 // i - columns
@@ -337,7 +380,7 @@ void GamePlayScene::loadMatrix() {
                         Square *sq1 = (Square*)this->getChildByTag(i - tableGame->getColumns());
                         if (sq->getSouth() && sq1->getNorth()) {
                             matran[i][i - tableGame->getColumns()] = 1;
-                        }else matran[i][i - tableGame->getColumns()] = -1;
+                        }else matran[i][i - tableGame->getColumns()] = 0;
                     }
                 } 
             }
@@ -355,8 +398,8 @@ void GamePlayScene::changeMatrix(Square *sq) {
                 matran[i][i+1] = 1;
                 matran[i+1][i] = 1;
             }else {
-                matran[i][i+1] = -1;
-                matran[i+1][i] = -1;
+                matran[i][i+1] = 0;
+                matran[i+1][i] = 0;
             }
         }
     }
@@ -368,8 +411,8 @@ void GamePlayScene::changeMatrix(Square *sq) {
                 matran[i][i-1] = 1;
                 matran[i-1][i] = 1;
             }else {
-                matran[i-1][i] = -1;
-                matran[i][i-1] = -1;
+                matran[i-1][i] = 0;
+                matran[i][i-1] = 0;
             }
         }
     }
@@ -382,8 +425,8 @@ void GamePlayScene::changeMatrix(Square *sq) {
                 matran[i][i + tableGame->getColumns()] = 1;
                 matran[i + tableGame->getColumns()][i] = 1;
             }else {
-                matran[i][i + tableGame->getColumns()] = -1;
-                matran[i + tableGame->getColumns()][i] = -1;
+                matran[i][i + tableGame->getColumns()] = 0;
+                matran[i + tableGame->getColumns()][i] = 0;
             }
         }
 
@@ -396,8 +439,8 @@ void GamePlayScene::changeMatrix(Square *sq) {
                 matran[i][i - tableGame->getColumns()] = 1;
                 matran[i- tableGame->getColumns()][i] = 1;
             }else {
-                matran[i][i - tableGame->getColumns()] = -1;
-                matran[i- tableGame->getColumns()][i] = -1;
+                matran[i][i - tableGame->getColumns()] = 0;
+                matran[i- tableGame->getColumns()][i] = 0;
             }
         }
     }
@@ -408,5 +451,14 @@ void GamePlayScene::printMatrix() {
             printf("%i  ", matran[i][j]);
         }
         printf("\n");
+    }
+}
+void GamePlayScene::InPa()
+{
+    CCLOG("kjnkjkjkjkjkjkkjjjjjj");
+}
+void GamePlayScene::resetArray(int a[]) {
+    for (int i = 0; i < max; i++) {
+        a[i] = 0;
     }
 }

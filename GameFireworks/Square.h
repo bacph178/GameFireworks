@@ -16,6 +16,7 @@ public:
     Square();
     Square(bool notContain, bool w, bool e, bool n, bool s, int row, int column,
            bool statPoint, bool destination);
+    void changeRotation(int columnsTable);
 private:
     CC_SYNTHESIZE(bool, _notContain, NotContain);
     CC_SYNTHESIZE(bool, _east, East);

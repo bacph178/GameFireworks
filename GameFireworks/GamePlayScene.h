@@ -32,11 +32,19 @@ public:
     void loadMatrix();
     void changeMatrix(Square *sq);
     void printMatrix();
+    void backTracking(int i);
+    void loadStartPointAndDestination();
+    void InPa();
+    void resetArray(int a[]);
+    void checkTableGame();
 private:
     CCSize  size;
     TableGame * tableGame;
     CCArray * _arraySquare;
+    CCArray * _arrayRemove;
     CCPoint touchLocation;
+    int arrarDestination[20];
+    int arrayStart[20];
     int matran[max][max];
     int daxet[max];
     int pa[max];
