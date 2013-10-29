@@ -45,8 +45,10 @@ public:
     void checkTableGame();
     void addArrayInArray(int arrayPaths[20][100], int arrayPath[], int row, int sizeArray);
     void resetArrayTow(int a[100][100]);
-    
     void runActionCoin(Coin * coin);
+    void removeSquare();
+    void downSquare();
+    void removeObject(CCNode * node);
 private:
     CCSize  size;
     TableGame * tableGame;
