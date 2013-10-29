@@ -44,14 +44,15 @@ bool GamePlayScene::init()
     _arraySquare = new CCArray();
     _arrayRemove = new CCArray();
     _numberPath = 0;
-    
+    this->resetArrayTow(arrayPath);
     this->addTableGame(9, 6);
+    this->addCoins();
+    this->addMissiles();
     this->loadMatrix();
 //    this->printMatrix();
     this->checkTableGame();
 
-    this->addCoins();
-    this->addMissiles();
+    
     
     return true;
 }
@@ -145,14 +146,29 @@ void GamePlayScene::addCoins() {
         coin->initWithFile("Icon.png");
         coin->setScale(0.5f);
         Square * sq = (Square*)this->getChildByTag(1 + tableGame->getColumns() * (i - 1));
-        CCPoint p = CCPoint(sq->getPosition().x - sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
+        CCPoint p = CCPoint(sq->getPosition().x - sq->getContentSize().width * sq->getScaleX(),
+                            sq->getPosition().y);
         coin->setPosition(p);
+        coin->setRow(i);
         coin->setTag(100 + i);
         this->addChild(coin, 10);
     }
 }
-void GamePlayScene::addCoin(int row, float speed) {
-    
+void GamePlayScene::addCoin(int row, float speed, int path[], int numberPoint) {
+    Coin *coin = new Coin();
+    coin->initWithFile("Icon.png");
+    coin->setScale(0.5f);
+    coin->setSpeed(speed);
+    coin->setPath(path);
+    coin->setNumberPoint(numberPoint);
+    Square * sq = (Square*)this->getChildByTag(1 + tableGame->getColumns() * (row - 1));
+    CCPoint p = CCPoint(sq->getPosition().x - sq->getContentSize().width * sq->getScaleX(),
+                        sq->getPosition().y);
+    coin->setPosition(p);
+    coin->setRow(row);
+    coin->setTag(100 + row);
+    this->addChild(coin, 10);
+    this->runActionCoin(coin);
 }
 void GamePlayScene::addMissiles() {
     for (int i = 1; i <= tableGame->getRows(); i++) {
@@ -163,7 +179,8 @@ void GamePlayScene::addMissiles() {
         Square * sq = (Square*)this->getChildByTag(tableGame->getColumns() * i);
         CCPoint p = CCPoint(sq->getPosition().x + sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
         missile->setPosition(p);
-        missile->setTag(200 + i);
+        missile->setTag(500 + i);
+        missile->setRow(i);
         this->addChild(missile, 10);
     }
 }
@@ -313,7 +330,6 @@ void GamePlayScene::checkTableGame() {
                 Square * sqTaget = (Square*)this->getChildByTag(j * tableGame->getColumns());
                 if (sqTaget->getDestination()) {
                     this->backTrackingNew(2, sqTaget);
-                    
                 }
             }            
         }
@@ -366,7 +382,9 @@ void GamePlayScene::backTrackingNew(int i, Square * sqTaget) {
             c += matran[pa[i-1]][j];
             if(sqTaget->getTag() == j)
             {
+                Square * sq = (Square*)this->getChildByTag(pa[1]);
                 _numberPath ++;
+                this->addCoin(sq->getRow() , 1.0f / i, pa, i);
                 this->addArrayInArray(arrayPath, pa, _numberPath, i);
             }else backTrackingNew(i+1, sqTaget);
             
@@ -524,10 +542,34 @@ void GamePlayScene::resetArrayTow(int (*a)[100]) {
 void GamePlayScene::addArrayInArray(int (*arrayPaths)[100], int *arrayPath, int row, int sizeArray) {
     for (int i = 1; i <= sizeArray; i ++) {
         arrayPaths[row][i] = arrayPath[i];
-//        Square * sq = (Square*)this->getChildByTag(arrayPath[i]);
-//        if (sq->getDestination()) {
-//            this->addCoins();
-//            break;
-//        }
     }
+}
+void GamePlayScene::runActionCoin(Coin *coin) {
+    int *path = coin->getPath();
+    CCArray * arPath = new CCArray();
+    for (int i = 1; i <= coin->getNumberPoint(); i++) {
+        if (i == coin->getNumberPoint()) {
+             Square *sq = (Square*)this->getChildByTag(path[coin->getNumberPoint()]);
+            int tag = 500 + sq->getRow();
+            if (this->getChildByTag(tag)){
+               
+                Missile *missile = (Missile*)this->getChildByTag(tag);
+                CCMoveTo * move = CCMoveTo::create(coin->getSpeed(), missile->getPosition());
+                arPath->addObject(move);
+            }else {
+                Square *sq = (Square*)this->getChildByTag(path[i]);
+                CCMoveTo * move = CCMoveTo::create(coin->getSpeed(), sq->getPosition());
+                arPath->addObject(move);
+
+            }
+        }else {
+            Square *sq = (Square*)this->getChildByTag(path[i]);
+            CCMoveTo * move = CCMoveTo::create(coin->getSpeed(), sq->getPosition());
+            arPath->addObject(move);
+        }  
+    }
+    CCHide * hide = CCHide::create();
+    arPath->addObject(hide);
+    CCSequence * squen = CCSequence::create(arPath);
+    coin->runAction(squen);
 }
