@@ -31,9 +31,9 @@ public:
 	virtual void ccTouchesEnded(cocos2d::CCSet* touches,cocos2d::CCEvent* event);
     
     void addTableGame(int rows, int columns);
-    void addCoins();
-    void addCoin(int row, float speed, int path[]);
-    void addMissiles();
+//    void addCoins();
+//    void addCoin(int row, float speed, int path[]);
+//    void addMissiles();
     void loadMatrix();
     void changeMatrix(Square *sq);
     void printMatrix(int matrix[100][100], int row, int column);
@@ -45,6 +45,8 @@ public:
     void checkTableGame();
     void addArrayInArray(int arrayPaths[20][100], int arrayPath[], int row, int sizeArray);
     void resetArrayTow(int a[100][100]);
+    void removeSquare();
+    void downSquare();
 private:
     CCSize  size;
     TableGame * tableGame;
