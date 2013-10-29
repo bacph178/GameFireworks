@@ -49,9 +49,12 @@ bool GamePlayScene::init()
     this->loadMatrix();
 //    this->printMatrix();
     this->checkTableGame();
+    
+    this->schedule(schedule_selector(GamePlayScene::downSquare), 0.1);
 
-    this->addCoins();
-    this->addMissiles();
+
+//    this->addCoins();
+//    this->addMissiles();
     
     return true;
 }
@@ -82,26 +85,33 @@ void GamePlayScene::addTableGame(int rows, int columns) {
             bool s = true;
             bool statPoint = true;
             bool destination = true;
-            if (category == 0) {
-                 w = true;
-                 e = true;
-                 n = false;
-                 s = false;
-            }else if(category == 1) {
-                 w = false;
-                 e = true;
-                 n = true;
-                 s = false;
-            }else if(category == 2) {
-                 w = true;
-                 e = true;
-                 n = true;
-                 s = false;
-            }else if(category == 3) {
-                 w = true;
-                 e = true;
-                 n = true;
-                 s = true;
+            switch (category) {
+                case 0:
+                    w = true;
+                    e = true;
+                    n = false;
+                    s = false;
+                    break;
+                case 1:
+                    w = false;
+                    e = true;
+                    n = true;
+                    s = false;
+                    break;
+                case 2:
+                    w = true;
+                    e = true;
+                    n = true;
+                    s = false;
+                    break;
+                case 3:
+                    w = true;
+                    e = true;
+                    n = true;
+                    s = true;
+                    break;
+                default:
+                    break;
             }
 
             if (dem == 1 + columns * (i - 1) && w == true) {
@@ -139,34 +149,34 @@ void GamePlayScene::addTableGame(int rows, int columns) {
     }
 
 }
-void GamePlayScene::addCoins() {
-    for (int i = 1; i <= tableGame->getRows(); i++) {
-        Coin *coin = new Coin();
-        coin->initWithFile("Icon.png");
-        coin->setScale(0.5f);
-        Square * sq = (Square*)this->getChildByTag(1 + tableGame->getColumns() * (i - 1));
-        CCPoint p = CCPoint(sq->getPosition().x - sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
-        coin->setPosition(p);
-        coin->setTag(100 + i);
-        this->addChild(coin, 10);
-    }
-}
-void GamePlayScene::addCoin(int row, float speed) {
-    
-}
-void GamePlayScene::addMissiles() {
-    for (int i = 1; i <= tableGame->getRows(); i++) {
-        Missile *missile = new Missile();
-        missile->initWithFile("Icon.png");
-        missile->setScale(0.5f);
-        missile->setColor(ccc3(255, 0, 0));
-        Square * sq = (Square*)this->getChildByTag(tableGame->getColumns() * i);
-        CCPoint p = CCPoint(sq->getPosition().x + sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
-        missile->setPosition(p);
-        missile->setTag(200 + i);
-        this->addChild(missile, 10);
-    }
-}
+//void GamePlayScene::addCoins() {
+//    for (int i = 1; i <= tableGame->getRows(); i++) {
+//        Coin *coin = new Coin();
+//        coin->initWithFile("Icon.png");
+//        coin->setScale(0.5f);
+//        Square * sq = (Square*)this->getChildByTag(1 + tableGame->getColumns() * (i - 1));
+//        CCPoint p = CCPoint(sq->getPosition().x - sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
+//        coin->setPosition(p);
+//        coin->setTag(100 + i);
+//        this->addChild(coin, 10);
+//    }
+//}
+//void GamePlayScene::addCoin(int row, float speed) {
+//    
+//}
+//void GamePlayScene::addMissiles() {
+//    for (int i = 1; i <= tableGame->getRows(); i++) {
+//        Missile *missile = new Missile();
+//        missile->initWithFile("Icon.png");
+//        missile->setScale(0.5f);
+//        missile->setColor(ccc3(255, 0, 0));
+//        Square * sq = (Square*)this->getChildByTag(tableGame->getColumns() * i);
+//        CCPoint p = CCPoint(sq->getPosition().x + sq->getContentSize().width * sq->getScaleX(), sq->getPosition().y);
+//        missile->setPosition(p);
+//        missile->setTag(200 + i);
+//        this->addChild(missile, 10);
+//    }
+//}
 void GamePlayScene::ccTouchesBegan(cocos2d::CCSet * touch,cocos2d::CCEvent* event)
 {
    
@@ -318,10 +328,11 @@ void GamePlayScene::checkTableGame() {
             }            
         }
     }
-    
     this->printMatrix(arrayPath, _numberPath, 25);
     _numberPath = 0;
     this->resetArrayTow(arrayPath);
+    this->removeSquare();
+    this->downSquare();
 }
 void GamePlayScene::backTracking(int i) {
     int n = tableGame->getRows() * tableGame->getColumns();
@@ -368,7 +379,11 @@ void GamePlayScene::backTrackingNew(int i, Square * sqTaget) {
             {
                 _numberPath ++;
                 this->addArrayInArray(arrayPath, pa, _numberPath, i);
-            }else backTrackingNew(i+1, sqTaget);
+                for (int k = 1; k <= i; k++) {
+                    Square *sq = (Square *)this->getChildByTag(pa[k]);
+                        _arrayRemove->addObject(sq);
+                }
+            } else backTrackingNew(i+1, sqTaget);
             
             daxet[j] = 0;
             c -= matran[pa[i-1]][j];
@@ -529,5 +544,106 @@ void GamePlayScene::addArrayInArray(int (*arrayPaths)[100], int *arrayPath, int 
 //            this->addCoins();
 //            break;
 //        }
+    }
+}
+
+void GamePlayScene::removeSquare() {
+    CCObject * ob;
+    CCARRAY_FOREACH(_arrayRemove, ob) {
+        Square * sq = (Square *) ob;
+        _arraySquare->removeObject(ob);
+        this->removeChild(sq);
+    }
+    _arrayRemove->removeAllObjects();
+}
+
+void GamePlayScene::downSquare() {
+    CCObject * ob;
+    CCPoint pOrigin = CCPoint(- size.width / 20, 0);
+    float with = tableGame->getWidth() / tableGame->getColumns() * 1.0f;
+    float height = tableGame->getHeight() / tableGame->getRows() * 1.0f;
+    int index = tableGame->getRows() * tableGame->getColumns();
+    CCARRAY_FOREACH(_arraySquare, ob) {
+        Square * sq = (Square *) ob;
+        if (sq->getTag() >= 7 && !this->getChildByTag(sq->getTag() - 6)) {
+            float mv = sq->getContentSize().height * sq->getScaleY();
+            CCMoveBy * mb = CCMoveBy::create(0.1, ccp(0, -mv));
+            sq->runAction(mb);
+            sq->setTag(sq->getTag() - 6);
+        }
+        if (sq->getTag() <= index ) {
+            sq->setVisible(true);
+        }
+    }
+    for (int k = index + 1; k <= index + 6; k++) {
+        int category = rand() % 4;
+        char tileName[7][20];
+        strcpy(tileName[0], "Square1");
+        strcpy(tileName[1], "Square2");
+        strcpy(tileName[2], "Square3");
+        strcpy(tileName[3], "Square4");
+        char spriteName[100];
+        sprintf(spriteName, "%s.png", tileName[category]);
+        bool notContain = false;
+        bool w = true;
+        bool e = true;
+        bool n = true;
+        bool s = true;
+        bool statPoint = true;
+        bool destination = true;
+        switch (category) {
+            case 0:
+                w = true;
+                e = true;
+                n = false;
+                s = false;
+                break;
+            case 1:
+                w = false;
+                e = true;
+                n = true;
+                s = false;
+                break;
+            case 2:
+                w = true;
+                e = true;
+                n = true;
+                s = false;
+                break;
+            case 3:
+                w = true;
+                e = true;
+                n = true;
+                s = true;
+                break;
+            default:
+                break;
+        }
+        if (k == index + 1 && w == true) {
+            statPoint = true;
+        }else statPoint = false;
+        
+        if (k == index + 6 && e == true) {
+            destination = true;
+        }else destination = false;
+        Square *sq = new  Square(notContain, w, e, n, s, tableGame->getColumns(),
+                                 k - index, statPoint, destination );
+        sq->initWithFile(spriteName);
+        if (statPoint) {
+            sq->setColor(ccc3(255, 0, 0));
+        }else if (destination) sq->setColor(ccc3(255, 100, 100));
+        float sx = with * 1.0f / sq->getContentSize().width;
+        float sy = height * 1.0f / sq->getContentSize().height;
+        sq->setScaleX(sx);
+        sq->setScaleY(sy);
+        CCPoint p = ccp(pOrigin.x + ((k - index) + 0.5f) *
+                        sq->getContentSize().width * sx,
+                        pOrigin.y + (tableGame->getRows() + 1 + 0.5f) *
+                        sq->getContentSize().height * (sy));
+        sq->setPosition(p);
+        _arraySquare->addObject(sq);
+        this->addChild(sq, 1, k);
+        sq->setTag(k);
+        sq->setVisible(false);
     }
 }
